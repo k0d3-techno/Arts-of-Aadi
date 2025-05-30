@@ -2,80 +2,83 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Aadi's Art Gallery</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Open+Sans&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/lightbox2@2.11.3/dist/css/lightbox.min.css" rel="stylesheet" />
 
   <style>
     body {
       margin: 0;
-      font-family: 'Open Sans', sans-serif;
-      background: #f2f2f7;
-      color: #333;
+      background: linear-gradient(135deg, #1e1e2f, #2a2a40);
+      font-family: 'Inter', sans-serif;
+      color: #f2f2f2;
     }
 
     header {
       text-align: center;
       padding: 3rem 1rem 2rem;
-      background: linear-gradient(to right, #a18cd1, #fbc2eb);
-      color: white;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
     header h1 {
       font-family: 'Playfair Display', serif;
       font-size: 3rem;
       margin: 0;
-    }
-
-    header p {
-      margin: 0.5rem 0 0;
-      font-size: 1.1rem;
-      opacity: 0.9;
+      background: linear-gradient(90deg, #e3ff5b, #00e5ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .gallery {
-      column-count: 4;
-      column-gap: 0;
-      max-width: 1600px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+      max-width: 1200px;
       margin: auto;
     }
 
     .image-card {
-      display: inline-block;
-      width: 100%;
-      margin: 0;
-      padding: 0;
-      break-inside: avoid;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .image-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
     }
 
     .image-card img {
       width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 0;
+      height: 200px;
+      object-fit: cover;
+      transition: transform 0.4s ease;
     }
 
-    @media (max-width: 1200px) {
-      .gallery {
-        column-count: 3;
-      }
+    .image-card:hover img {
+      transform: scale(1.05);
     }
 
-    @media (max-width: 800px) {
-      .gallery {
-        column-count: 2;
-      }
+    .caption {
+      padding: 1rem;
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #ccc;
     }
 
     @media (max-width: 500px) {
-      .gallery {
-        column-count: 1;
-      }
-
       header h1 {
-        font-size: 2.2rem;
+        font-size: 2rem;
       }
     }
   </style>
@@ -84,7 +87,6 @@
 
   <header>
     <h1>Aadi's Art Gallery</h1>
-    <p>Explore the creative universe of Aadi's stunning artworks</p>
   </header>
 
   <div class="gallery"></div>
@@ -92,8 +94,9 @@
   <script src="https://cdn.jsdelivr.net/npm/lightbox2@2.11.3/dist/js/lightbox.min.js"></script>
 
   <script>
-    const folderId = "1iilgFg_cukJuqakbuDcljU9-8w4vYwg9";
-    const apiKey = "AIzaSyAG1ejkSJk5Z1nn6OWP9I_jMiDQCInDZ4Y";
+    const folderId = "1iilgFg_cukJuqakbuDcljU9-8w4vYwg9"; // Your folder ID
+    const apiKey = "AIzaSyAG1ejkSJk5Z1nn6OWP9I_jMiDQCInDZ4Y"; // Paste your Google Drive API key
+
     const gallery = document.querySelector(".gallery");
 
     async function loadDriveImages() {
@@ -111,8 +114,9 @@
         data.files.forEach(file => {
           const imageId = file.id;
           const imageName = file.name;
+
           const imageUrl = `https://drive.google.com/uc?export=view&id=${imageId}`;
-          const thumbUrl = `https://drive.google.com/uc?export=view&id=${imageId}`;
+          const thumbUrl = `https://drive.google.com/thumbnail?id=${imageId}`;
 
           const anchor = document.createElement("a");
           anchor.href = imageUrl;
@@ -127,6 +131,11 @@
           card.className = "image-card";
           anchor.appendChild(img);
           card.appendChild(anchor);
+
+          const caption = document.createElement("div");
+          caption.className = "caption";
+          caption.textContent = imageName;
+          card.appendChild(caption);
 
           gallery.appendChild(card);
         });
