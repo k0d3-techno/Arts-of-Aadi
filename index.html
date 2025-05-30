@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Aadi's Art Gallery</title>
+  <title>Aadi's Handsome Gallery</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/lightbox2@2.11.3/dist/css/lightbox.min.css" rel="stylesheet" />
-
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     body {
       margin: 0;
@@ -18,17 +16,11 @@
 
     header {
       text-align: center;
-      padding: 3rem 1rem 2rem;
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 20px rgba(0,0,0,0.4);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding: 2.5rem 1rem;
     }
 
     header h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 3rem;
-      margin: 0;
+      font-size: 2.5rem;
       background: linear-gradient(90deg, #e3ff5b, #00e5ff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -36,114 +28,178 @@
 
     .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 2rem;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem;
       padding: 2rem;
       max-width: 1200px;
       margin: auto;
     }
 
     .image-card {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 18px;
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      transition: transform 0.3s;
+      cursor: pointer;
     }
 
     .image-card:hover {
-      transform: translateY(-6px) scale(1.02);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      transform: scale(1.03);
     }
 
     .image-card img {
       width: 100%;
       height: 200px;
       object-fit: cover;
-      transition: transform 0.4s ease;
+      display: block;
     }
 
-    .image-card:hover img {
-      transform: scale(1.05);
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0; top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(5px);
+      align-items: center;
+      justify-content: center;
     }
 
-    .caption {
+    .modal-content {
+      position: relative;
+      max-width: 90vw;
+      max-height: 90vh;
+      background: #222;
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-content img {
+      width: 100%;
+      height: auto;
+      max-height: 70vh;
+      object-fit: contain;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
       padding: 1rem;
-      text-align: center;
-      font-size: 1rem;
-      font-weight: 600;
-      color: #ccc;
+      background: #111;
+      border-top: 1px solid #333;
     }
 
-    @media (max-width: 500px) {
-      header h1 {
-        font-size: 2rem;
-      }
+    .modal-actions button {
+      background: none;
+      border: none;
+      color: #eee;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .modal-actions button:hover {
+      color: #00e5ff;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>Aadi's Art Gallery</h1>
+    <h1>Aadi's Gallery</h1>
   </header>
 
   <div class="gallery"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/lightbox2@2.11.3/dist/js/lightbox.min.js"></script>
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <img id="modal-image" src="" alt="">
+      <div class="modal-actions">
+        <button onclick="likeImage()">❤️ Like</button>
+        <button onclick="commentImage()">💬 Comment</button>
+        <button onclick="closeModal()">❌ Close</button>
+      </div>
+    </div>
+  </div>
 
   <script>
-    const folderId = "1iilgFg_cukJuqakbuDcljU9-8w4vYwg9"; // Your folder ID
-    const apiKey = "AIzaSyAG1ejkSJk5Z1nn6OWP9I_jMiDQCInDZ4Y"; // Paste your Google Drive API key
+    const folderId = "1iilgFg_cukJuqakbuDcljU9-8w4vYwg9"; // Replace with your actual folder ID
+    const apiKey = "AIzaSyAG1ejkSJk5Z1nn6OWP9I_jMiDQCInDZ4Y"; // Paste your API key here
 
     const gallery = document.querySelector(".gallery");
+    const modal = document.getElementById("modal");
+    const modalImg = document.getElementById("modal-image");
 
     async function loadDriveImages() {
       const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+mimeType+contains+'image'&key=${apiKey}&fields=files(id,name,mimeType)`;
-
       try {
         const res = await fetch(url);
         const data = await res.json();
 
         if (!data.files || data.files.length === 0) {
-          gallery.innerHTML = "<p style='text-align:center;'>No images found. Make sure your folder is public.</p>";
+          gallery.innerHTML = "<p style='text-align:center;'>No images found.</p>";
           return;
         }
 
         data.files.forEach(file => {
           const imageId = file.id;
-          const imageName = file.name;
-
-          const imageUrl = `https://drive.google.com/uc?export=view&id=${imageId}`;
           const thumbUrl = `https://drive.google.com/thumbnail?id=${imageId}`;
-
-          const anchor = document.createElement("a");
-          anchor.href = imageUrl;
-          anchor.setAttribute("data-lightbox", "gallery");
-          anchor.setAttribute("data-title", imageName);
+          const fullUrl = `https://drive.google.com/uc?export=view&id=${imageId}`;
 
           const img = document.createElement("img");
           img.src = thumbUrl;
-          img.alt = imageName;
+          img.alt = "";
 
           const card = document.createElement("div");
           card.className = "image-card";
-          anchor.appendChild(img);
-          card.appendChild(anchor);
+          card.appendChild(img);
 
-
+          card.addEventListener("click", () => {
+            openModal(fullUrl);
+          });
 
           gallery.appendChild(card);
         });
-      } catch (error) {
-        console.error("Error fetching images:", error);
-        gallery.innerHTML = "<p style='text-align:center;color:red;'>Error loading gallery.</p>";
+      } catch (err) {
+        gallery.innerHTML = "<p style='text-align:center;color:red;'>Failed to load images.</p>";
+        console.error(err);
       }
+    }
+
+    function openModal(imageUrl) {
+      modalImg.src = imageUrl;
+      modal.style.display = "flex";
+    }
+
+    function closeModal() {
+      modal.style.display = "none";
+      modalImg.src = "";
+    }
+
+    function likeImage() {
+      alert("❤️ You liked this painting!");
+    }
+
+    function commentImage() {
+      const comment = prompt("💬 Leave a comment:");
+      if (comment) alert(`Thanks! You said: "${comment}"`);
     }
 
     loadDriveImages();
   </script>
-
 </body>
 </html>
