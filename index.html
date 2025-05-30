@@ -3,203 +3,352 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Aadi's Handsome Gallery</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
+  <title>Brother's Paintings Gallery</title>
   <style>
+    /* Basic styles for gallery */
     body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #eee;
       margin: 0;
-      background: linear-gradient(135deg, #1e1e2f, #2a2a40);
-      font-family: 'Inter', sans-serif;
-      color: #f2f2f2;
+      padding: 0;
     }
-
-    header {
-      text-align: center;
-      padding: 2.5rem 1rem;
-    }
-
-    header h1 {
-      font-size: 2.5rem;
-      background: linear-gradient(90deg, #e3ff5b, #00e5ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
     .gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 1.5rem;
-      padding: 2rem;
-      max-width: 1200px;
-      margin: auto;
+      grid-template-columns: repeat(auto-fill,minmax(220px,1fr));
+      gap: 15px;
+      padding: 20px;
     }
-
-    .image-card {
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-      transition: transform 0.3s;
+    .gallery img {
+      width: 100%;
       cursor: pointer;
-    }
-
-    .image-card:hover {
-      transform: scale(1.03);
-    }
-
-    .image-card img {
-      width: 100%;
-      height: 200px;
+      border-radius: 8px;
+      transition: transform 0.3s ease;
       object-fit: cover;
-      display: block;
+      height: 160px;
+    }
+    .gallery img:hover {
+      transform: scale(1.05);
     }
 
-    /* Modal styles */
+    /* Modal */
     .modal {
-      display: none;
       position: fixed;
-      z-index: 100;
-      left: 0; top: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(5px);
-      align-items: center;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.9);
+      display: none;
       justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
     }
-
+    .modal.active {
+      display: flex;
+    }
     .modal-content {
       position: relative;
       max-width: 90vw;
       max-height: 90vh;
       background: #222;
-      border-radius: 16px;
-      overflow: hidden;
+      border-radius: 10px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      animation: fadeIn 0.4s ease;
+      width: 600px;
+      padding: 20px;
+      box-sizing: border-box;
+      color: #fff;
     }
-
-    @keyframes fadeIn {
-      from { transform: scale(0.9); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 28px;
+      cursor: pointer;
     }
-
-    .modal-content img {
-      width: 100%;
-      height: auto;
-      max-height: 70vh;
+    .modal-image {
+      max-height: 60vh;
+      margin-bottom: 15px;
+      border-radius: 8px;
       object-fit: contain;
+      width: 100%;
     }
-
     .modal-actions {
       display: flex;
-      justify-content: space-around;
-      width: 100%;
-      padding: 1rem;
-      background: #111;
-      border-top: 1px solid #333;
+      gap: 15px;
+      align-items: center;
+      margin-bottom: 10px;
     }
-
-    .modal-actions button {
-      background: none;
-      border: none;
-      color: #eee;
-      font-size: 1.2rem;
+    .like-btn, .comment-btn {
       cursor: pointer;
-      transition: color 0.2s;
+      background: transparent;
+      border: none;
+      font-size: 24px;
+      color: #aaa;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+    }
+    .like-btn.liked {
+      color: #e0245e;
+    }
+    .like-count {
+      font-size: 16px;
     }
 
-    .modal-actions button:hover {
-      color: #00e5ff;
+    /* Comments */
+    .comments {
+      max-height: 150px;
+      overflow-y: auto;
+      background: #111;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .comment {
+      padding: 5px 0;
+      border-bottom: 1px solid #333;
+      font-size: 14px;
+      color: #ddd;
+    }
+    .comment:last-child {
+      border-bottom: none;
+    }
+    .comment-input {
+      display: flex;
+      gap: 10px;
+    }
+    .comment-input textarea {
+      flex-grow: 1;
+      resize: none;
+      padding: 8px;
+      border-radius: 5px;
+      border: none;
+      font-size: 14px;
+    }
+    .comment-input button {
+      background: #0a84ff;
+      border: none;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .comment-input button:disabled {
+      background: #555;
+      cursor: not-allowed;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>Aadi's Gallery</h1>
-  </header>
+<div class="gallery" id="gallery">
+  <!-- Images will be injected here -->
+</div>
 
-  <div class="gallery"></div>
-
-  <!-- Modal -->
-  <div class="modal" id="modal">
-    <div class="modal-content">
-      <img id="modal-image" src="" alt="">
-      <div class="modal-actions">
-        <button onclick="likeImage()">❤️ Like</button>
-        <button onclick="commentImage()">💬 Comment</button>
-        <button onclick="closeModal()">❌ Close</button>
-      </div>
+<!-- Modal -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <button class="modal-close" id="modal-close">&times;</button>
+    <img src="" alt="Painting" class="modal-image" id="modal-image" />
+    <div class="modal-actions">
+      <button class="like-btn" id="like-btn" aria-label="Like Button">❤️ <span class="like-count" id="like-count">0</span></button>
     </div>
+    <div class="comments" id="comments"></div>
+    <form class="comment-input" id="comment-form">
+      <textarea id="comment-text" rows="2" placeholder="Add a comment..." required></textarea>
+      <button type="submit" id="comment-submit" disabled>Post</button>
+    </form>
   </div>
+</div>
 
-  <script>
-    const folderId = "1iilgFg_cukJuqakbuDcljU9-8w4vYwg9"; // Replace with your actual folder ID
-    const apiKey = "AIzaSyAG1ejkSJk5Z1nn6OWP9I_jMiDQCInDZ4Y"; // Paste your API key here
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
-    const gallery = document.querySelector(".gallery");
-    const modal = document.getElementById("modal");
-    const modalImg = document.getElementById("modal-image");
+  // Your Firebase config (replace with your config)
+  const firebaseConfig = {
+    apiKey: "AIzaSyAyn9klkZwxWiLrbAuUwXwDVAKfmsIg4KE",
+    authDomain: "paintings-of-aadi.firebaseapp.com",
+    projectId: "paintings-of-aadi",
+    storageBucket: "paintings-of-aadi.firebasestorage.app",
+    messagingSenderId: "768419951053",
+    appId: "1:768419951053:web:b4c18a25e8d5e5ffcc9484",
+    measurementId: "G-TR4C1V8ZM6"
+  };
 
-    async function loadDriveImages() {
-      const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+mimeType+contains+'image'&key=${apiKey}&fields=files(id,name,mimeType)`;
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-        if (!data.files || data.files.length === 0) {
-          gallery.innerHTML = "<p style='text-align:center;'>No images found.</p>";
-          return;
-        }
+  // *** Add your Google Drive API Key and Folder ID here ***
+  const DRIVE_API_KEY = "AIzaSyAG1ejkSJk5Z1nn6OWP9I_jMiDQCInDZ4Y"; // <-- Replace with your Drive API key
+  const DRIVE_FOLDER_ID = "1iilgFg_cukJuqakbuDcljU9-8w4vYwg9"; // <-- Replace with your Drive folder ID
 
-        data.files.forEach(file => {
-          const imageId = file.id;
-          const thumbUrl = `https://drive.google.com/thumbnail?id=${imageId}`;
-          const fullUrl = `https://drive.google.com/uc?export=view&id=${imageId}`;
+  const gallery = document.getElementById('gallery');
+  const modal = document.getElementById('modal');
+  const modalImage = document.getElementById('modal-image');
+  const modalClose = document.getElementById('modal-close');
+  const likeBtn = document.getElementById('like-btn');
+  const likeCountEl = document.getElementById('like-count');
+  const commentsEl = document.getElementById('comments');
+  const commentForm = document.getElementById('comment-form');
+  const commentText = document.getElementById('comment-text');
+  const commentSubmit = document.getElementById('comment-submit');
 
-          const img = document.createElement("img");
-          img.src = thumbUrl;
-          img.alt = "";
+  let currentPainting = null;
+  let currentDocRef = null;
+  let unsubscribeSnapshot = null;
 
-          const card = document.createElement("div");
-          card.className = "image-card";
-          card.appendChild(img);
+  // Function to fetch images from Google Drive folder
+  async function fetchDriveImages() {
+    const query = `'${DRIVE_FOLDER_ID}' in parents and mimeType contains 'image/' and trashed = false`;
+    const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&key=${DRIVE_API_KEY}&fields=files(id,name,mimeType,webContentLink,thumbnailLink)`;
 
-          card.addEventListener("click", () => {
-            openModal(fullUrl);
-          });
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
 
-          gallery.appendChild(card);
-        });
-      } catch (err) {
-        gallery.innerHTML = "<p style='text-align:center;color:red;'>Failed to load images.</p>";
-        console.error(err);
+      if (!data.files || data.files.length === 0) {
+        console.warn("No images found in the Drive folder.");
+        return [];
       }
+
+      // Google Drive direct link construction:
+      // Use webContentLink or create your own link to download the file
+      return data.files.map(file => `https://drive.google.com/uc?export=view&id=${file.id}`);
+    } catch (error) {
+      console.error("Failed to fetch images from Google Drive:", error);
+      return [];
+    }
+  }
+
+  // Helper: create gallery thumbnails dynamically
+  async function createGallery() {
+    const paintings = await fetchDriveImages();
+    if (paintings.length === 0) {
+      gallery.innerHTML = "<p>No images found in the Drive folder.</p>";
+      return;
     }
 
-    function openModal(imageUrl) {
-      modalImg.src = imageUrl;
-      modal.style.display = "flex";
+    paintings.forEach(url => {
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = "Painting";
+      img.loading = "lazy";
+      img.addEventListener('click', () => openModal(url));
+      gallery.appendChild(img);
+    });
+  }
+
+  // Open modal with selected painting
+  async function openModal(url) {
+    currentPainting = url;
+    modal.classList.add('active');
+    modalImage.src = url;
+
+    // Get Firestore doc ref for this painting by encoding URL
+    const docId = btoa(url); // simple base64 encoding for doc id
+    currentDocRef = doc(db, "paintings", docId);
+
+    // Setup listener for real-time updates
+    if (unsubscribeSnapshot) unsubscribeSnapshot();
+    unsubscribeSnapshot = onSnapshot(currentDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        updateLikeAndComments(data);
+      } else {
+        // Initialize document if doesn't exist
+        setDoc(currentDocRef, { likes: 0, likedBy: [], comments: [] });
+      }
+    });
+  }
+
+  // Update like count and comments UI
+  function updateLikeAndComments(data) {
+    likeCountEl.textContent = data.likes || 0;
+    const userId = getUserId();
+    if (data.likedBy && data.likedBy.includes(userId)) {
+      likeBtn.classList.add('liked');
+    } else {
+      likeBtn.classList.remove('liked');
     }
 
-    function closeModal() {
-      modal.style.display = "none";
-      modalImg.src = "";
+    commentsEl.innerHTML = "";
+    if (data.comments && data.comments.length > 0) {
+      data.comments.forEach(c => {
+        const div = document.createElement('div');
+        div.className = "comment";
+        div.textContent = c;
+        commentsEl.appendChild(div);
+      });
     }
+  }
 
-    function likeImage() {
-      alert("❤️ You liked this painting!");
+  // Generate or retrieve a unique user ID for anonymous likes
+  function getUserId() {
+    let id = sessionStorage.getItem('userId');
+    if (!id) {
+      id = crypto.randomUUID();
+      sessionStorage.setItem('userId', id);
     }
+    return id;
+  }
 
-    function commentImage() {
-      const comment = prompt("💬 Leave a comment:");
-      if (comment) alert(`Thanks! You said: "${comment}"`);
+  // Like button toggle
+  likeBtn.addEventListener('click', async () => {
+    if (!currentDocRef) return;
+    const userId = getUserId();
+    const docSnap = await getDoc(currentDocRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      let likes = data.likes || 0;
+      let likedBy = data.likedBy || [];
+      if (likedBy.includes(userId)) {
+        // Unlike
+        likes--;
+        likedBy = likedBy.filter(id => id !== userId);
+      } else {
+        // Like
+        likes++;
+        likedBy.push(userId);
+      }
+      await updateDoc(currentDocRef, { likes, likedBy });
     }
+  });
 
-    loadDriveImages();
-  </script>
+  // Comment form submit
+  commentForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!currentDocRef) return;
+    const text = commentText.value.trim();
+    if (text.length === 0) return;
+
+    await updateDoc(currentDocRef, {
+      comments: arrayUnion(text)
+    });
+    commentText.value = '';
+    commentSubmit.disabled = true;
+  });
+
+  // Enable submit button only when textarea has content
+  commentText.addEventListener('input', () => {
+    commentSubmit.disabled = commentText.value.trim().length === 0;
+  });
+
+  // Close modal
+  modalClose.addEventListener('click', () => {
+    modal.classList.remove('active');
+    if (unsubscribeSnapshot) unsubscribeSnapshot();
+  });
+
+  // Initialize gallery on load
+  createGallery();
+
+</script>
 </body>
 </html>
