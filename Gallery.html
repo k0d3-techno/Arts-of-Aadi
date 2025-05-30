@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aadi's Art Gallery</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Open+Sans&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/lightbox2@2.11.3/dist/css/lightbox.min.css" rel="stylesheet" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Open Sans', sans-serif;
+      background: #fffdf9;
+      color: #333;
+    }
+
+    header {
+      text-align: center;
+      padding: 3rem 1rem;
+      background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      margin: 0;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .image-card {
+      overflow: hidden;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .image-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+    }
+
+    .image-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .image-card:hover img {
+      transform: scale(1.03);
+    }
+
+    .caption {
+      padding: 1rem;
+      font-weight: bold;
+      font-size: 1rem;
+      text-align: center;
+      background-color: white;
+    }
+
+    @media (max-width: 500px) {
+      header h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Aadi's Art Gallery</h1>
+  </header>
+
+  <div class="gallery"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/lightbox2@2.11.3/dist/js/lightbox.min.js"></script>
+
+  <script>
+    const folderId = "1iilgFg_cukJuqakbuDcljU9-8w4vYwg9"; 
+    const apiKey = "AIzaSyAG1ejkSJk5Z1nn6OWP9I_jMiDQCInDZ4Y";    
+
+    const gallery = document.querySelector(".gallery");
+
+    async function loadDriveImages() {
+      const url = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+mimeType+contains+'image'&key=${apiKey}&fields=files(id,name,mimeType)`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!data.files || data.files.length === 0) {
+          gallery.innerHTML = "<p style='text-align:center;'>No images found. Make sure your folder is public.</p>";
+          return;
+        }
+
+        data.files.forEach(file => {
+          const imageId = file.id;
+          const imageName = file.name;
+
+          const imageUrl = `https://drive.google.com/uc?export=view&id=${imageId}`;
+          const thumbUrl = `https://drive.google.com/thumbnail?id=${imageId}`;
+
+          const anchor = document.createElement("a");
+          anchor.href = imageUrl;
+          anchor.setAttribute("data-lightbox", "gallery");
+          anchor.setAttribute("data-title", imageName);
+
+          const img = document.createElement("img");
+          img.src = thumbUrl;
+          img.alt = imageName;
+
+          const card = document.createElement("div");
+          card.className = "image-card";
+          anchor.appendChild(img);
+          card.appendChild(anchor);
+
+          const caption = document.createElement("div");
+          caption.className = "caption";
+          caption.textContent = imageName;
+          card.appendChild(caption);
+
+          gallery.appendChild(card);
+        });
+      } catch (error) {
+        console.error("Error fetching images:", error);
+        gallery.innerHTML = "<p style='text-align:center;color:red;'>Error loading gallery.</p>";
+      }
+    }
+
+    loadDriveImages();
+  </script>
+</body>
+</html>
