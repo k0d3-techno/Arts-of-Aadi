@@ -5,101 +5,77 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Aadi's Art Gallery</title>
 
-  <!-- Fonts & Lightbox -->
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Open+Sans&display=swap" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/lightbox2@2.11.3/dist/css/lightbox.min.css" rel="stylesheet" />
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
       font-family: 'Open Sans', sans-serif;
-      background: linear-gradient(to right, #f9fcff, #f3e8ff);
+      background: #f2f2f7;
       color: #333;
     }
 
     header {
       text-align: center;
-      padding: 4rem 1rem 2rem;
-      background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+      padding: 3rem 1rem 2rem;
+      background: linear-gradient(to right, #a18cd1, #fbc2eb);
       color: white;
     }
 
     header h1 {
       font-family: 'Playfair Display', serif;
-      font-size: 3.5rem;
-      margin-bottom: 0.5rem;
-      text-shadow: 1px 1px 2px #00000033;
+      font-size: 3rem;
+      margin: 0;
     }
 
     header p {
-      font-size: 1.2rem;
-      margin-top: 0;
+      margin: 0.5rem 0 0;
+      font-size: 1.1rem;
       opacity: 0.9;
     }
 
-    .accent-line {
-      width: 80px;
-      height: 4px;
-      background: white;
-      margin: 1rem auto;
-      border-radius: 2px;
-    }
-
     .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 2rem;
-      padding: 3rem 2rem;
-      max-width: 1400px;
+      column-count: 4;
+      column-gap: 0;
+      max-width: 1600px;
       margin: auto;
     }
 
     .image-card {
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-      background: rgba(255, 255, 255, 0.3);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
-      transition: transform 0.4s ease, box-shadow 0.4s ease;
-    }
-
-    .image-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+      display: inline-block;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      break-inside: avoid;
     }
 
     .image-card img {
       width: 100%;
       height: auto;
       display: block;
-      transition: transform 0.3s ease;
+      border-radius: 0;
     }
 
-    .image-card:hover img {
-      transform: scale(1.05);
+    @media (max-width: 1200px) {
+      .gallery {
+        column-count: 3;
+      }
     }
 
-    .caption {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      padding: 0.75rem;
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
-      color: white;
-      font-weight: 600;
-      text-align: center;
-      font-size: 1rem;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+    @media (max-width: 800px) {
+      .gallery {
+        column-count: 2;
+      }
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 500px) {
+      .gallery {
+        column-count: 1;
+      }
+
       header h1 {
-        font-size: 2.5rem;
+        font-size: 2.2rem;
       }
     }
   </style>
@@ -108,7 +84,6 @@
 
   <header>
     <h1>Aadi's Art Gallery</h1>
-    <div class="accent-line"></div>
     <p>Explore the creative universe of Aadi's stunning artworks</p>
   </header>
 
@@ -137,7 +112,7 @@
           const imageId = file.id;
           const imageName = file.name;
           const imageUrl = `https://drive.google.com/uc?export=view&id=${imageId}`;
-          const thumbUrl = `https://drive.google.com/thumbnail?id=${imageId}`;
+          const thumbUrl = `https://drive.google.com/uc?export=view&id=${imageId}`;
 
           const anchor = document.createElement("a");
           anchor.href = imageUrl;
@@ -152,11 +127,6 @@
           card.className = "image-card";
           anchor.appendChild(img);
           card.appendChild(anchor);
-
-          const caption = document.createElement("div");
-          caption.className = "caption";
-          caption.textContent = imageName;
-          card.appendChild(caption);
 
           gallery.appendChild(card);
         });
